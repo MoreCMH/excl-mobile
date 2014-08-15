@@ -417,13 +417,16 @@ function createExhibitImageViewConfig(exhibit) {
 
 function getExhibitImageHeight() {
 	var aspectRatio = 4 / 7;
-	return detectDevice.getWidth() * aspectRatio;
+	var deviceWidthInPx = detectDevice.getWidth();
+	var deviceWidthInDip = detectDevice.pxToDip(deviceWidthInPx);
+	return deviceWidthInDip * aspectRatio;
 }
 
 function resizeExhibitCarouselAndroid() {
-	var exhibitTitleHeightInPx = detectDevice.dipToPx(getExhibitTitleLabelHeight());
-	var carouselHeight = getExhibitImageHeight() + exhibitTitleHeightInPx;
-	$.exhibitsCarousel.height = carouselHeight;
+	var exhibitTitleHeightInDip = getExhibitTitleLabelHeight();
+	var exhibitImageHeightInDip = getExhibitImageHeight();
+	var carouselHeightInDip = exhibitImageHeightInDip + exhibitTitleHeightInDip;
+	$.exhibitsCarousel.height = carouselHeightInDip;
 }
 
 function createComponentTitleLabel(item) {
@@ -494,8 +497,8 @@ function onExhibitsClick(exhibits) {
 
 function animateTopViewDown() {
 	var headingLabelHeight = makeDefaultUnitsFromDip($.headingLabelView.height);
-	var topMeasurement = $.infoView.toImage().height - headingLabelHeight;
-
+	var infoViewHeight = detectDevice.pxToDip($.infoView.toImage().height);
+	var topMeasurement = infoViewHeight - headingLabelHeight;
 	var animationDuration = 300;
 
 	$.arrowIcon.animate({
@@ -512,7 +515,6 @@ function animateTopViewDown() {
 		$.topView.top = topMeasurement;
 		$.headingLabel.text = "Go Back";
 	}, animationDuration);
-
 }
 
 function animateTopViewUp() {
@@ -542,12 +544,7 @@ function isBottomViewShowing() {
 }
 
 function makeDefaultUnitsFromDip(str) {
-	//Strip units
 	num = stripUnitsOffMeasurement(str);
-	//Convert to px if necessary
-	if (OS_ANDROID) {
-		num = detectDevice.dipToPx(num);
-	}
 	return num;
 }
 
@@ -558,7 +555,6 @@ function stripUnitsOffMeasurement(str) {
 function onExhibitsScroll(e, exhibits) {
 	var index = $.exhibitsCarousel.currentPage;
 	$.headingLabel.text = "Tap to Explore!";
-	//"Explore This " + json.data.museum.exhibit_label;
 	$.exhibitInfoLabel.text = exhibits[index].description;
 	animateTopViewUp();
 	setTimeout(function() {
@@ -610,17 +606,11 @@ function getComponentImageHeight() {
 	var headingLabelViewHeight = stripUnitsOffMeasurement($.headingLabelView.height);
 	var componentScrollViewHeadingHeight = stripUnitsOffMeasurement($.componentScrollViewHeading.height);
 	var componentTitleLabelHeight = stripUnitsOffMeasurement(getComponentTitleLabelHeight());
-	var infoViewHeight = $.infoView.toImage().height;
-	if (OS_ANDROID) {
-		headingLabelViewHeight = detectDevice.dipToPx(headingLabelViewHeight);
-		componentScrollViewHeadingHeight = detectDevice.dipToPx(componentScrollViewHeadingHeight);
-		componentTitleLabelHeight = detectDevice.dipToPx(componentTitleLabelHeight);
-	}
-
+	var infoViewHeight = detectDevice.pxToDip($.infoView.toImage().height);
 	var componentImageHeight = (infoViewHeight - headingLabelViewHeight - componentScrollViewHeadingHeight - componentTitleLabelHeight - 6);
-	
 	var desiredMaxWidthProportion = 0.8; 
-	var desiredMaxWidth = desiredMaxWidthProportion * detectDevice.getWidth();
+	var deviceWidthInDip = detectDevice.pxToDip(detectDevice.getWidth());
+	var desiredMaxWidth = desiredMaxWidthProportion * deviceWidthInDip;
 	//Each component image can take up no more than this fraction of the screen width (adjust to ensure that multiple components can be seen in scroller)
 	if (getComponentImageWidth(componentImageHeight) > desiredMaxWidth){
 		componentImageHeight = getComponentImageHeightFromWidth(desiredMaxWidth);

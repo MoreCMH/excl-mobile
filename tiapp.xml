@@ -42,9 +42,12 @@
 			<uses-feature
 			android:name="android.hardware.telephony"
 			android:required="false" />
-			<supports-screens android:anyDensity="false"
-			android:largeScreens="true" android:normalScreens="true"
-			android:resizeable="true" android:smallScreens="false" android:xlargeScreens="false"/>
+			<supports-screens 
+				android:anyDensity="true"
+				android:smallScreens="false" 
+				android:normalScreens="true"
+				android:largeScreens="true" 
+				android:xlargeScreens="false"/>
 			<application>
 				<activity android:configChanges="keyboardHidden"
 				android:name="org.appcelerator.titanium.TiActivity" android:screenOrientation="portrait"/>
